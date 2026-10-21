@@ -1,0 +1,11 @@
+node_modules/
+tokens.json
+*.tokens.json
+*.log
+.DS_Store
+.env
+keys.txt
+accounts.json
+accounts.jsonl
+proxies.txt
+outputs/

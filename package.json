@@ -1,0 +1,34 @@
+{
+  "name": "cursor2api",
+  "version": "0.1.0",
+  "description": "Unofficial bridge: a Cursor account (PKCE browser login or Cursor API key) -> OpenAI-compatible local API.",
+  "type": "module",
+  "bin": {
+    "cursor2api": "bin/cursor2api.js"
+  },
+  "main": "src/server.js",
+  "files": [
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node bin/cursor2api.js serve",
+    "login": "node bin/cursor2api.js login",
+    "test": "node test/smoke.js"
+  },
+  "keywords": [
+    "cursor",
+    "openai-compatible",
+    "bridge",
+    "connect-rpc",
+    "api2.cursor.sh",
+    "9router"
+  ],
+  "license": "MIT",
+  "dependencies": {}
+}
