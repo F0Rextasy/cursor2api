@@ -1,9 +1,24 @@
-> 🌐 **Read this in:** **English** *(this file)* · Türkçe · 中文 · 日本語 · 한국어 · Deutsch · Français ·
-> Español · Português · Русский — the nine translations ship in a follow-up pass (`README.<lang>.md`).
+<div align="center">
 
 # cursor2api
 
 Unofficial bridge that turns a **Cursor** account into a local **OpenAI-compatible API**.
+
+[![Node](https://img.shields.io/badge/Node-%E2%89%A518-3DA639?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Dependencies](https://img.shields.io/badge/dependencies-0-blue?style=for-the-badge)](#)
+[![License](https://img.shields.io/badge/license-MIT-6ea8fe?style=for-the-badge)](LICENSE)
+[![9Router](https://img.shields.io/badge/9Router-connector-8B5CF6?style=for-the-badge)](#-connect-to-9router)
+[![OmniRoute](https://img.shields.io/badge/OmniRoute-connector-8B5CF6?style=for-the-badge)](#-connect-to-omniroute)
+
+[🔌 9Router](#-connect-to-9router) · [🔌 OmniRoute](#-connect-to-omniroute)
+
+</div>
+
+<div align="center">
+
+**English** · [Türkçe](README.tr.md) · [中文](README.cn.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Português](README.pt.md)
+
+</div>
 
 ```
 OpenAI client / 9router  ──►  cursor2api (local)  ──►  api2.cursor.sh (Connect RPC)
@@ -37,6 +52,28 @@ node bin/cursor2api.js help      # zero dependencies, nothing to install
 Or drop the folder anywhere and call `node /path/to/cursor2api/bin/cursor2api.js …`; there is no build
 step and no `npm install` (Node 18+ ships everything the bridge uses).
 
+## One command
+
+Point the tool at your Cursor API keys (`api-keys.txt`, one `key_…` per line) and it builds verified
+bridge credentials — exchange, live chat probe, keep only the 200s:
+
+```bash
+node src/cli.js mint --count 5 --pool proxies.txt   # 5 verified credentials in keys.txt
+```
+
+A definite reject (401/403, an exhausted quota, a disabled account) is recorded as
+`key`, reason and ISO time in `keys-dead.txt` next to `keys.txt`; a 429/5xx/transport failure is
+retried and never marked dead. `--dry` prints the plan and writes nothing.
+
+> **Quality gates.** Every credential here passed a live `chat-200` before it was written to `keys.txt`
+> (dead keys are never shipped). Router combos follow the same rule at the model level: an entry is
+> added **only if the model answers `chat-200` and can call tools** — a model without tool support,
+> a dead key or a dead provider is dropped instead of added. Works with **9Router and OmniRoute**.
+
+> ⚠️ **Terms & account risk.** cursor2api is an unofficial bridge: automating a provider can violate
+> its Terms of Service and get accounts or IPs banned. You run this on accounts you own, from your own
+> machine, at your own risk. Read the provider's ToS before a large run.
+
 ## Quick start
 
 ```bash
@@ -69,12 +106,39 @@ curl http://127.0.0.1:8795/v1/chat/completions \
 | `GET /v1/usage` | Cursor plan + period usage | `DashboardService`. |
 | `GET /healthz` | `{ ok, hasToken, expiresAt, proxy }` | Liveness. |
 
-## Wiring it into 9router
+## 🔌 Connect to 9Router
+
+[9Router](https://9router.com) talks to this bridge as a plain OpenAI-compatible provider:
 
 1. Providers → add → **OpenAI Compatible**
 2. Base URL: `http://127.0.0.1:8795/v1`
 3. API key: anything non-empty (or the value you passed to `--key`)
 4. Model: any id from `GET /v1/models`
+
+Or let the bundled connector do those four steps for you — it creates the provider node and the connection on a local 9Router:
+
+```bash
+node src/launcher.js --connect-9router --9router-base http://localhost:20128 --9router-password 123456
+```
+
+Defaults: `--prefix cursor2api`, `--name Cursor (bridge)`, `--base-url http://127.0.0.1:8795/v1`. Start the bridge first (`node bin/cursor2api.js serve`); 9Router then lists the models as `cursor2api/<model id>`. The bridge is a normal local OpenAI server, so Cline, Continue, Open WebUI, LiteLLM or any `OPENAI_BASE_URL` client work the same way.
+
+## 🔌 Connect to OmniRoute
+
+[OmniRoute](https://omniroute.online) talks to this bridge as a plain OpenAI-compatible provider:
+
+1. Providers → add → **OpenAI Compatible**
+2. Base URL: `http://127.0.0.1:8795/v1`
+3. API key: anything non-empty (or the value you passed to `--key`)
+4. Model: any id from `GET /v1/models`
+
+Or let the bundled connector do those four steps for you — it creates the provider node and the connection on a local OmniRoute:
+
+```bash
+node src/launcher.js --connect-omniroute --omniroute-base http://localhost:20128 --omniroute-password 123456
+```
+
+Defaults: `--prefix cursor2api`, `--name Cursor (bridge)`, `--base-url http://127.0.0.1:8795/v1`. Start the bridge first (`node bin/cursor2api.js serve`); OmniRoute then lists the models as `cursor2api/<model id>`. The bridge is a normal local OpenAI server, so Cline, Continue, Open WebUI, LiteLLM or any `OPENAI_BASE_URL` client work the same way.
 
 ## How the upstream call works
 
@@ -156,7 +220,6 @@ bridge — as the thing that can get banned. What this bridge does and does not 
 
 If a token starts answering 401/403 for every model, that is usually the account, not the bridge: run
 `cursor2api login` again, then `cursor2api status` to see the plan and remaining allowance.
-
 
 ## License
 

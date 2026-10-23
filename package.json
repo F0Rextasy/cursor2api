@@ -17,9 +17,13 @@
     "node": ">=18"
   },
   "scripts": {
-    "start": "node bin/cursor2api.js serve",
+    "start": "node src/launcher.js",
     "login": "node bin/cursor2api.js login",
-    "test": "node test/smoke.js"
+    "launcher": "node src/launcher.js",
+    "9router": "node src/connect-9router.js",
+    "test": "node test/smoke.js",
+    "omniroute": "node src/connect-omniroute.js",
+    "mint": "node src/cli.js --auto"
   },
   "keywords": [
     "cursor",
